@@ -1,0 +1,18 @@
+[project]
+name = "archup"
+dynamic = ["version"]
+dependencies = [
+    "click",
+    "pyyaml",
+    "schema"]
+
+[project.scripts]
+archup = "archup.cli:main"
+
+[build-system]
+requires = [
+    "setuptools",
+    "setuptools-scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]

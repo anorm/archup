@@ -1,0 +1,6 @@
+datamodel:
+  description: ""
+  entities:
+    first:
+      name: First entity
+diagrams: []
