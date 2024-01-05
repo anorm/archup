@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "module": "archup.cli",
-            "args": ["datamodel", "validate", "archup/template/datamodel.yaml"],
+            "args": ["datamodel", "validate", "archup/template/src/datamodel.yaml"],
             "justMyCode": true
         }
     ]

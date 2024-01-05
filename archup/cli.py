@@ -1,11 +1,16 @@
 import click
 
-from .schema import load_workspace
+from .datamodel import Datamodel
 # from .markdown import generate_markdown
-from .project import create_new_project
+from .project import create_new_project, Project
 
 
-@click.group()
+class OrderCommands(click.Group):
+    def list_commands(self, ctx: click.Context) -> list[str]:
+        return list(self.commands)
+
+
+@click.group(cls=OrderCommands)
 def main():
     """
     Archup command line utility
@@ -14,14 +19,26 @@ def main():
     pass
 
 
-@main.command()
+@main.group()
+def project():
+    """
+    Commands to work with projects
+    """
+    pass
+
+
+@project.command()
 @click.argument("name")
-def new(name):
+@click.option("-f", "--force",
+              is_flag=True,
+              help="Create the project even though the directory already "
+                   "exists")
+def new(name, force):
     """
     Create a new architecture project
     """
 
-    create_new_project(name)
+    create_new_project(name, force)
 
 
 @main.group()
@@ -40,17 +57,20 @@ def validate(filename):
     Validates a datamodel workspace YAML file
     """
 
-    load_workspace(filename)
+    Datamodel(filename)
     print("OK")
 
 
-@datamodel.command()
-@click.argument("filename", type=click.File("r"))
-def generate():
+@main.command()
+@click.option("-p", "--project", "project_filename",
+              type=click.File("r"),
+              default="./archup.conf", show_default=True)
+def build(project_filename):
     """
-    Generate markdown from a datamodel
+    Build project
     """
-    pass
+    p = Project(project_filename)
+    p.build()
 
 
 if __name__ == "__main__":

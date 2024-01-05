@@ -3,7 +3,7 @@ import schema
 from typing import TextIO
 
 
-workspace_schema = schema.Schema({
+_schema = schema.Schema({
     "datamodel": {
         "description": str,
         "entities": {
@@ -47,10 +47,14 @@ workspace_schema = schema.Schema({
 })
 
 
-def load_workspace(filestream: TextIO):
-    workspace = yaml.safe_load(filestream)
-    try:
-        workspace_schema.validate(workspace)
-        return workspace
-    except schema.SchemaError as e:
-        raise e
+class Datamodel:
+    def __init__(self, filestream):
+        self._workspace = self._load_from_file(filestream)
+
+    def _load_from_file(self, filestream: TextIO):
+        workspace = yaml.safe_load(filestream)
+        try:
+            _schema.validate(workspace)
+            return workspace
+        except schema.SchemaError as e:
+            raise e

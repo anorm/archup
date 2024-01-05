@@ -4,6 +4,7 @@ dynamic = ["version"]
 dependencies = [
     "click",
     "pyyaml",
+    "requests",
     "schema"]
 
 [project.scripts]
