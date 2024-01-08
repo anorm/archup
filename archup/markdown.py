@@ -3,6 +3,7 @@ import requests
 
 from .datamodel import DataModel
 
+
 class MarkdownGenerator:
     def __init__(self):
         self._download_cache = {}
@@ -22,20 +23,34 @@ class MarkdownGenerator:
             return "U"
         return dir
 
-    def _plantuml_include(self, stream, url):
-        if url not in self._download_cache:
-            r = requests.get(url, allow_redirects=True)
-            content = io.StringIO()
-            for line in r.content.decode("utf-8").splitlines():
-                if line.startswith("!include http"):
-                    _, suburl = line.split()
-                    self._plantuml_include(content, suburl)
-                else:
-                    self._writeline(content, line)
-            self._download_cache[url] = content.getvalue()
-        self._writeline(stream)
-        self._writeline(stream, self._download_cache[url])
-        self._writeline(stream)
+    def _plantuml_include(self, stream, file_or_url):
+        """
+        Inlude the contents of a file or url into the plantuml stream,
+        caching any includes that are downloaded.
+        """
+        # Open a stream to the source
+        if file_or_url.startswith(("https://", "http://")):
+            if file_or_url not in self._download_cache:
+                r = requests.get(file_or_url, allow_redirects=True)
+                self._download_cache[file_or_url] = r.content.decode("utf-8")
+            include_stream = io.StringIO(self._download_cache[file_or_url])
+        else:
+            include_stream = open(file_or_url, "r", encoding="utf-8")
+
+        # Iterate through the included file, recursing into embedded includes
+        for line in include_stream.read().splitlines():
+            if line.startswith("!include "):
+                _, suburl = line.split()
+                self._plantuml_include(stream, suburl)
+            elif line.startswith(("@startuml", "@enduml")):
+                # skip the file markers
+                # TODO: decide if we should only include what's inside the
+                #       markers
+                pass
+            else:
+                self._writeline(stream, line)
+
+        include_stream.close()
 
     def _generate_diagram(self, workspace: DataModel, whitelist=None,
                           blacklist=None, internal=None, external=None,

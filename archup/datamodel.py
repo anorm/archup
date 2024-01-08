@@ -58,9 +58,9 @@ class DataModel:
             return workspace
         except schema.SchemaError as e:
             raise e
-        
+
     def diagrams(self):
         return self._workspace.get("diagrams", [])
-    
+
     def datamodel(self):
         return self._workspace.get("datamodel", {})
