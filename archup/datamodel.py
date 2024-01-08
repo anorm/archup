@@ -47,7 +47,7 @@ _schema = schema.Schema({
 })
 
 
-class Datamodel:
+class DataModel:
     def __init__(self, filestream):
         self._workspace = self._load_from_file(filestream)
 
@@ -58,3 +58,9 @@ class Datamodel:
             return workspace
         except schema.SchemaError as e:
             raise e
+        
+    def diagrams(self):
+        return self._workspace.get("diagrams", [])
+    
+    def datamodel(self):
+        return self._workspace.get("datamodel", {})

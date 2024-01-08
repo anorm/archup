@@ -3,7 +3,7 @@ import shutil
 import yaml
 from typing import TextIO
 
-from .datamodel import Datamodel
+from .datamodel import DataModel
 from .markdown import MarkdownGenerator
 
 
@@ -33,10 +33,20 @@ class Project:
     def __init__(self, project_file: TextIO):
         self._config = yaml.safe_load(project_file)
         self.name = self._config.get("name", "Unnamed")
-        with open(self._config["datamodel"]["filename"]) as f:
-            self.datamodel = Datamodel(f)
+        self.project_dir = os.path.dirname(project_file.name)
+
+        filename = self._resolve_path(self._config["datamodel"]["filename"])
+        with open(filename) as f:
+            self.datamodel = DataModel(f)
+
+    def _resolve_path(self, relative_path):
+        """
+        Resolves a path relative to the project configuratino file
+        """
+        return os.path.join(self.project_dir, relative_path)
 
     def build(self):
         generator = MarkdownGenerator()
-        with open(self.config["datamodel"]["markdown"], "w") as f:
+        filename = self._resolve_path(self._config["datamodel"]["markdown"])
+        with open(filename, "w") as f:
             generator.generate(f, self.datamodel)

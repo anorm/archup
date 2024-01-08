@@ -1,6 +1,6 @@
 import click
 
-from .datamodel import Datamodel
+from .datamodel import DataModel
 # from .markdown import generate_markdown
 from .project import create_new_project, Project
 
@@ -57,7 +57,7 @@ def validate(filename):
     Validates a datamodel workspace YAML file
     """
 
-    Datamodel(filename)
+    DataModel(filename)
     print("OK")
 
 
