@@ -5,4 +5,4 @@ services:
       - 8081:8080
     volumes:
       - ./src:/usr/local/structurizr
-      #- ./plugins:/usr/local/structurizr/plugins
+      - ./.structurizr-plugins:/usr/local/structurizr/plugins

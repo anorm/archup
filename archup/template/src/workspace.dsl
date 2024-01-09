@@ -13,8 +13,5 @@ workspace {
         }
     }
 
-    configuration {
-        scope softwaresystem
-    }
-
+    !plugin plantuml.PlantUMLEncoderPlugin
 }

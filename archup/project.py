@@ -1,4 +1,5 @@
 import os
+import requests
 import shutil
 import yaml
 from typing import TextIO
@@ -24,6 +25,18 @@ def create_new_project(name, force):
     shutil.copytree(template_dir, project_dir,
                     dirs_exist_ok=force,
                     copy_function=_verbose_copy)
+
+    remote_files = {".structurizr-plugins/": "https://github.com/anorm/structurizr-examples/raw/main/dsl/plantuml-and-mermaid/dsl/plugins/plugin-1.0-SNAPSHOT.jar"}
+    for path, url in remote_files.items():
+        local_filename = os.path.join(project_dir, path, url.split('/')[-1])
+        print(f"  - {local_filename}")
+        os.makedirs(os.path.join(project_dir, path), exist_ok=True)
+        r = requests.get(url, stream=True)
+        with open(local_filename, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=1024):
+                if chunk:
+                    f.write(chunk)
+
     print(f"Project created in {project_dir}")
 
     # TODO Template expansion
