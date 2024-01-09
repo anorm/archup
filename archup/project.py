@@ -60,8 +60,6 @@ def create_new_project(name, force):
 
     print(f"Project created in {project_dir}")
 
-    # TODO Template expansion
-
 
 class Project:
     def __init__(self, project_file: TextIO):
