@@ -3,4 +3,11 @@ datamodel:
   entities:
     first:
       name: First entity
-diagrams: []
+    second:
+      name: Second entity
+      relations:
+        - to: first
+          description: uses
+diagrams:
+  - name: Overview
+    type: overview
