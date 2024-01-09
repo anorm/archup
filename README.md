@@ -30,7 +30,7 @@ docker compose up
 Navigate to http://127.0.0.1:8081
 
 
-## Shell completion
+## Shell completion (optional)
 
 ### Bash
 
