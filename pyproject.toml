@@ -3,9 +3,11 @@ name = "archup"
 dynamic = ["version"]
 dependencies = [
     "click",
+    "Jinja2",
     "pyyaml",
     "requests",
     "schema"]
+requires-python = ">3.9"
 
 [project.scripts]
 archup = "archup.cli:main"

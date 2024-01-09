@@ -1,3 +1,4 @@
+import jinja2
 import os
 import requests
 import shutil
@@ -8,9 +9,22 @@ from .datamodel import DataModel
 from .markdown import MarkdownGenerator
 
 
-def _verbose_copy(src, dst):
-    print(f"  - {dst}")
-    shutil.copyfile(src, dst)
+class TemplatingCopyer:
+    def __init__(self, values, template_suffix=".tmpl"):
+        self.values = values
+        self.template_suffix = template_suffix
+
+    def verbose_copy(self, src: str, dst: str):
+        if src.endswith(self.template_suffix):
+            real_dst = dst.removesuffix(self.template_suffix)
+            print(f"  - {real_dst} [T]")
+            with open(src, encoding="utf-8") as f:
+                template = jinja2.Template(f.read())
+            with open(real_dst, "w", encoding="utf-8") as f:
+                f.write(template.render(self.values))
+        else:
+            print(f"  - {dst}")
+            shutil.copyfile(src, dst)
 
 
 def create_new_project(name, force):
@@ -22,9 +36,16 @@ def create_new_project(name, force):
     project_dir = name
     template_dir = os.path.join(os.path.dirname(__file__), "template")
     print("Creating project")
+
+    values = {
+        "project": {
+            "name": name
+        }
+    }
+    copyer = TemplatingCopyer(values)
     shutil.copytree(template_dir, project_dir,
                     dirs_exist_ok=force,
-                    copy_function=_verbose_copy)
+                    copy_function=copyer.verbose_copy)
 
     remote_files = {".structurizr-plugins/": "https://github.com/anorm/structurizr-examples/raw/main/dsl/plantuml-and-mermaid/dsl/plugins/plugin-1.0-SNAPSHOT.jar"}
     for path, url in remote_files.items():
