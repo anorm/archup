@@ -38,6 +38,7 @@ _schema = schema.Schema({
         schema.Optional("description"): str,
         schema.Optional("whitelist"): [str],
         schema.Optional("blacklist"): [str],
+        schema.Optional("content"): {str: bool},
         schema.Optional("layout"): {
             str: {
                 str: schema.Or("L", "R", "U", "D")

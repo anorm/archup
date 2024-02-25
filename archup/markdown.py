@@ -187,25 +187,61 @@ class MarkdownGenerator:
         name = diagram.get("name", entity_id)
         layout = diagram.get("layout", {}).get(entity_id, {})
         entity_name = entity.get("name", entity_id)
-        # shortDescription = entity.get("shortDescription", "")
-        description = entity.get("description", "")
-        # examples = ", ".join([f"'{e}'" for e in entity.get("examples", [])])
         # properties = entity.get("properties", {})
-        self._writeline(ret, f"### {name}: {entity_name}")
+
+        if diagram.get("content", {}).get("headingPrefix", False):
+            prefix = f"{name}: "
+        else:
+            prefix = ""
+        akas = ", ".join([f'"_{a}_"' for a in entity.get("aka", [])])
+        if akas and diagram.get("content", {}).get("aka", False):
+            self._writeline(ret, f"### {prefix}{entity_name} <small>(aka {akas})</small>")
+        else:
+            self._writeline(ret, f"### {prefix}{entity_name}")
         self._writeline(ret)
-        self._writeline(ret, "```plantuml")
-        whitelist = [entity_id]
-        whitelist.extend(self._find_related_entities(workspace, entity_id))
-        self._writeline(ret,
-                        self._generate_diagram(workspace,
-                                               internal=[entity_id],
-                                               whitelist=whitelist,
-                                               layout=layout))
-        self._writeline(ret, "```")
-        self._writeline(ret)
-        if description:
+
+        examples = entity.get("examples", [])
+        if examples and diagram.get("content", {}).get("examples", False):
+            self._writeline(ret, "Examples:")
+            self._writeline(ret)
+            for example in examples:
+                self._writeline(ret, f'* "_{example}_"')
+            self._writeline(ret)
+
+        if diagram.get("content", {}).get("diagrams", False):
+            self._writeline(ret, "```plantuml")
+            whitelist = [entity_id]
+            whitelist.extend(self._find_related_entities(workspace, entity_id))
+            self._writeline(ret,
+                            self._generate_diagram(workspace,
+                                                   internal=[entity_id],
+                                                   whitelist=whitelist,
+                                                   layout=layout))
+            self._writeline(ret, "```")
+            self._writeline(ret)
+
+        description = entity.get("description", "")
+        if not description:
+            description = entity.get("shortDescription", "")
+        if description and diagram.get("content", {}).get("description", False):
             self._writeline(ret, description)
             self._writeline(ret)
+
+        properties = entity.get("properties", [])
+        if properties and diagram.get("content", {}).get("properties", False):
+            self._writeline(ret, "Properties:")
+            self._writeline(ret)
+            self._writeline(ret, "| Name | Type | Description |")
+            self._writeline(ret, "|------|------|-------------|")
+            for name, prop in properties.items():
+                desc = prop.get("description", "")
+                _type = prop.get("type", "")
+                values = prop.get("values", [])
+                if values:
+                    _type = _type + "(" + ", ".join(values) + ")"
+                self._writeline(ret, f"| {name} | {_type} | {desc} |")
+            self._writeline(ret)
+
         return ret.getvalue()
 
     def generate(self, fs, workspace: DataModel) -> str:
