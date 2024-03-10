@@ -41,7 +41,7 @@ _schema = schema.Schema({
         schema.Optional("content"): {str: bool},
         schema.Optional("layout"): {
             str: {
-                str: schema.Or("L", "R", "U", "D")
+                str: str
             }
         }
     }]

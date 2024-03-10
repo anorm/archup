@@ -13,15 +13,17 @@ class MarkdownGenerator:
         stream.write("\n")
 
     def _reverse_direction(self, dir):
-        if dir == "L":
-            return "R"
-        if dir == "R":
-            return "L"
-        if dir == "U":
-            return "D"
-        if dir == "D":
-            return "U"
-        return dir
+        def _inner(d):
+            if d == "L":
+                return "R"
+            if d == "R":
+                return "L"
+            if d == "U":
+                return "D"
+            if d == "D":
+                return "U"
+            return d
+        return "".join(map(_inner, dir))
 
     def _plantuml_include(self, stream, file_or_url):
         """
@@ -115,13 +117,13 @@ class MarkdownGenerator:
                 propertyString = "|".join([p for p in properties])
                 if id not in visibleEntities or to not in visibleEntities:
                     continue
-                direction = ""
+                direction = "-D->"
                 if f"{to}-{id}" in layout:
-                    direction = "_"+self._reverse_direction(layout[f"{to}-{id}"])
+                    direction = self._reverse_direction(layout[f"{to}-{id}"])
                 if f"{id}-{to}" in layout:
-                    direction = "_"+layout[f"{id}-{to}"]
+                    direction = layout[f"{id}-{to}"]
 
-                self._writeline(ret, f'Rel{direction}({id}, "{description}", {to}, {propertyString})')
+                self._writeline(ret, f'Rel_({id}, "{description}", {to}, "{propertyString}", "{direction}")')
 
         self._writeline(ret, "@enduml")
         return ret.getvalue()
